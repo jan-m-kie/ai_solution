@@ -1,0 +1,24 @@
+project: ai_solution
+description: AI-powered software engineering solution stack using CrewAI
+agents:
+  - name: DevAgent
+    role: code-generator
+    tools: [codeium, gpt-4o]
+  - name: TestAgent
+    role: quality-assurance
+    tools: [testim]
+  - name: SecAgent
+    role: security-auditor
+    tools: [snyk]
+  - name: DevOpsAgent
+    role: infra-automation
+    tools: [kubeAI, terraformAI]
+memory:
+  - type: qdrant
+    key: ${QDRANT_API_KEY}
+    url: ${QDRANT_URL}
+  - type: chromadb
+    url: ${CHROMADB_URL}
+llm:
+  provider: openai
+  key: ${OPENAI_API_KEY}
