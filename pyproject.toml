@@ -1,4 +1,18 @@
-[tool.crewai]
+[tool.poetry]
 name = "ai_solution"
-description = "Cloud-native CrewAI setup"
 version = "0.1.0"
+description = "Cloud-native AI solution stack using CrewAI"
+authors = ["jan-m-kie <your-email@example.com>"]
+readme = "README.md"
+packages = [{ include = "src" }]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+crewai = "*"
+openai = "*"
+qdrant-client = "*"
+chromadb = "*"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
