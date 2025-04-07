@@ -1,9 +1,0 @@
-agent: DevAgent
-description: Designs and writes code for requested features using Codeium and GPT-4o.
-steps:
-  - name: initialize
-    description: Setup environment for task execution.
-  - name: execute
-    description: Perform core responsibilities.
-  - name: report
-    description: Summarize findings and results.
