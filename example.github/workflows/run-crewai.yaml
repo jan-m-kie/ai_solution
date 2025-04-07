@@ -1,0 +1,32 @@
+name: CrewAI Automation
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ master ]
+
+jobs:
+  run-crewai:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install CrewAI
+        run: |
+          pip install crewai openai qdrant-client chromadb
+
+      - name: Run CrewAI from YAML
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          QDRANT_API_KEY: ${{ secrets.QDRANT_API_KEY }}
+          QDRANT_URL: ${{ secrets.QDRANT_URL }}
+          CHROMADB_URL: ${{ secrets.CHROMADB_URL }}
+        run: |
+          crewai run

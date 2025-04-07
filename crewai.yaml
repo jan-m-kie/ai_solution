@@ -1,0 +1,39 @@
+crew:
+  agents:
+    - id: dev
+      name: DevAgent
+      role: code-generator
+      tools: [codeium, gpt-4o]
+    - id: qa
+      name: TestAgent
+      role: quality-assurance
+      tools: [testim]
+    - id: sec
+      name: SecAgent
+      role: security-auditor
+      tools: [synk]
+    - id: devops
+      name: DevOpsAgent
+      role: infra-automation
+      tools: [kubeai, terraformai]
+
+  memory:
+    provider: qdrant
+    config:
+      api_key: ${QDRANT_API_KEY}
+      url: ${QDRANT_URL}
+
+  llm:
+    provider: openai
+    config:
+      api_key: ${OPENAI_API_KEY}
+
+tasks:
+  - agent_id: dev
+    description: Generate code for a basic microservice.
+  - agent_id: qa
+    description: Write tests for the microservice.
+  - agent_id: sec
+    description: Perform a security audit on the code.
+  - agent_id: devops
+    description: Generate Kubernetes deployment YAML for the microservice.
