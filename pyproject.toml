@@ -1,0 +1,14 @@
+[project]
+name = "ai_solution"
+version = "0.1.0"
+description = "AI-powered engineering solution using CrewAI"
+dependencies = [
+  "crewai",
+  "openai",
+  "qdrant-client",
+  "chromadb"
+]
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"

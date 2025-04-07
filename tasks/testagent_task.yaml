@@ -1,0 +1,9 @@
+agent: TestAgent
+description: Generates and executes test cases, ensures quality using Testim.
+steps:
+  - name: initialize
+    description: Setup environment for task execution.
+  - name: execute
+    description: Perform core responsibilities.
+  - name: report
+    description: Summarize findings and results.

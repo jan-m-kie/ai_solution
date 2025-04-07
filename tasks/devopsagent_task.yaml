@@ -1,0 +1,9 @@
+agent: DevOpsAgent
+description: Handles deployment and infrastructure automation using KubeAI and TerraformAI.
+steps:
+  - name: initialize
+    description: Setup environment for task execution.
+  - name: execute
+    description: Perform core responsibilities.
+  - name: report
+    description: Summarize findings and results.
