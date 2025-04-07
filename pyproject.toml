@@ -2,9 +2,9 @@
 name = "ai_solution"
 version = "0.1.0"
 description = "Cloud-native AI solution stack using CrewAI"
-authors = ["jan-m-kie <your-email@example.com>"]
+authors = ["jan-m-kie"]
 readme = "README.md"
-packages = [{ include = "src" }]
+packages = [{ include = "ai_solution", from = "src" }]
 
 [tool.poetry.dependencies]
 python = "^3.11"
