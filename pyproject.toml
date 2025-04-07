@@ -1,0 +1,4 @@
+[tool.crewai]
+name = "ai_solution"
+description = "Cloud-native CrewAI setup"
+version = "0.1.0"
