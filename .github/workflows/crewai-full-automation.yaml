@@ -1,0 +1,54 @@
+name: CrewAI Full Automation
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - crewai.yaml
+      - src/**
+      - terraform/**
+
+jobs:
+  crewai_and_terraform:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install poetry
+          poetry install
+
+      - name: Run CrewAI
+        run: poetry run crewai
+
+      - name: Commit generated .tf files
+        run: |
+          git config --global user.email "ai-bot@crewai"
+          git config --global user.name "CrewAI Bot"
+          git add terraform/*.tf || echo "No .tf files to commit"
+          git commit -m "Auto: Commit infra files from CrewAI" || echo "Nothing to commit"
+          git push || echo "No changes to push"
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v2
+
+      - name: Restore kubeconfig
+        run: |
+          echo "${{ secrets.KUBE_CONFIG_DATA }}" | base64 -d > ~/.kube/config
+          chmod 600 ~/.kube/config
+
+      - name: Terraform Init
+        working-directory: terraform
+        run: terraform init
+
+      - name: Terraform Apply
+        working-directory: terraform
+        run: terraform apply -auto-approve
