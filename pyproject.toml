@@ -8,7 +8,7 @@ packages = [{ include = "ai_solution", from = "src" }]
 
 [tool.poetry.dependencies]
 python = "^3.11"
-crewai = "^0.27.10"
+crewai = "*"
 openai = "*"
 qdrant-client = "*"
 chromadb = "*"
