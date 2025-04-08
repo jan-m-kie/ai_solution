@@ -30,11 +30,20 @@ crew:
 
 tasks:
   - agent_id: dev
-    description: Monitor repo changes and fix or improve GitHub workflows, Terraform config, or Python code. If no issue is detected, confirm success.
+    description: |
+      A new change has been made to the codebase. Please analyze the following diff and decide whether improvements are needed in CI/CD workflows, Terraform infrastructure, or Python code.
+
+      Diff:
+      {{DIFF}}
+
+      If no issues are found, confirm that everything looks good.
     expected_output: Proposed or committed patch to CI/CD, infra, or Python logic.
+
   - agent_id: qa
     description: Write tests for the microservice.
+
   - agent_id: sec
     description: Perform a security audit on the code.
+
   - agent_id: devops
     description: Generate Kubernetes deployment YAML for the microservice.
