@@ -36,10 +36,6 @@ jobs:
       - name: List Poetry packages
         run: poetry show
 
-      ### ✅ DEBUG: Check if CrewAI CLI is installed
-      - name: Check if CrewAI CLI is available
-        run: poetry run which crewai
-
       - name: Run CrewAI using module
         run: poetry run python -m crewai run crewai.yaml
 
