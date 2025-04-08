@@ -15,6 +15,9 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 2  # fetch 2 commits so HEAD^ is available
+
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -44,7 +47,12 @@ jobs:
 
       - name: Save changes to file for CrewAI
         run: |
-          git diff HEAD^ HEAD > diff.txt
+          if git rev-parse HEAD^ >/dev/null 2>&1; then
+            git diff HEAD^ HEAD > diff.txt
+          else
+            echo "Initial commit or no previous commit found" > diff.txt
+          fi
+
 
       - name: Run CrewAI using CLI
         run: crewai run crewai.yaml --input diff.txt
