@@ -16,7 +16,7 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v3
         with:
-          fetch-depth: 2  # fetch 2 commits so HEAD^ is available
+          fetch-depth: 2
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -34,7 +34,7 @@ jobs:
         run: |
           pip install poetry
           poetry install
-          pip install crewai  # Ensure CLI is available
+          pip install crewai
 
       - name: List Poetry packages
         run: poetry show
@@ -68,36 +68,30 @@ jobs:
           git commit -m "Auto: Commit infra files from CrewAI" || echo "Nothing to commit"
           git push || echo "No changes to push"
 
-      - name: Set up kubeconfig
+      - name: Set up kubeconfig from secret
         run: |
-          mkdir -p ~/.kube
-          echo "${{ secrets.KUBECONFIG_BASE64 }}" | base64 -d > ~/.kube/config
+          echo "${{ secrets.KUBE_CONFIG_DATA }}" | base64 -d > $GITHUB_WORKSPACE/ci-kubeconfig.yaml
 
-      - name: Set up Terraform
-        uses: hashicorp/setup-terraform@v2
-
-      - name: Restore kubeconfig
-        run: |
-          mkdir -p ~/.kube
-          echo "${{ secrets.KUBE_CONFIG_DATA }}" | base64 -d > ~/.kube/config
-          chmod 600 ~/.kube/config
+      - name: Set KUBECONFIG env var
+        run: echo "KUBECONFIG=$GITHUB_WORKSPACE/ci-kubeconfig.yaml" >> $GITHUB_ENV
 
       - name: Authenticate to GCP
         run: |
           echo "${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}" | base64 -d > "${HOME}/gcp-key.json"
           gcloud auth activate-service-account --key-file="${HOME}/gcp-key.json"
           gcloud config set project ai-solution-456211
-          gcloud container clusters get-credentials my-cluster --region europe-central2
+
+      - name: Print current kubeconfig context (debug)
+        run: |
+          kubectl config get-contexts
+          kubectl get ns || echo "kubectl not working"
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v2
 
       - name: Terraform Init
         working-directory: terraform
         run: terraform init
-
-      - name: Debug kubeconfig content
-        run: |
-          echo "$KUBE_CONFIG_DATA" | base64 -d
-          echo "------------"
-          echo "$KUBECONFIG"
 
       - name: Terraform Apply
         working-directory: terraform
