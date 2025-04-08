@@ -30,7 +30,8 @@ crew:
 
 tasks:
   - agent_id: dev
-    description: Generate code for a basic microservice.
+    description: Monitor repo changes and fix or improve GitHub workflows, Terraform config, or Python code. If no issue is detected, confirm success.
+    expected_output: Proposed or committed patch to CI/CD, infra, or Python logic.
   - agent_id: qa
     description: Write tests for the microservice.
   - agent_id: sec
