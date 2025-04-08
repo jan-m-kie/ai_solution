@@ -68,12 +68,40 @@ jobs:
           git commit -m "Auto: Commit infra files from CrewAI" || echo "Nothing to commit"
           git push || echo "No changes to push"
 
-      - name: Authenticate to GCP and configure kubeconfig
+      - name: Authenticate to GCP and build kubeconfig
         run: |
           echo "${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}" | base64 -d > "${HOME}/gcp-key.json"
           gcloud auth activate-service-account --key-file="${HOME}/gcp-key.json"
           gcloud config set project ai-solution-456211
-          gcloud container clusters get-credentials my-cluster --region europe-central2
+          
+          CLUSTER_NAME="my-cluster"
+          CLUSTER_REGION="europe-central2"
+          ENDPOINT=$(gcloud container clusters describe $CLUSTER_NAME --region $CLUSTER_REGION --format="value(endpoint)")
+          CA_CERT=$(gcloud container clusters describe $CLUSTER_NAME --region $CLUSTER_REGION --format="value(masterAuth.clusterCaCertificate)")
+          ACCESS_TOKEN=$(gcloud auth print-access-token)
+
+          cat > $GITHUB_WORKSPACE/ci-kubeconfig.yaml <<EOF
+          apiVersion: v1
+          kind: Config
+          clusters:
+          - cluster:
+              certificate-authority-data: ${CA_CERT}
+              server: https://${ENDPOINT}
+            name: gke_cluster
+          contexts:
+          - context:
+              cluster: gke_cluster
+              user: gke_user
+            name: gke_context
+          current-context: gke_context
+          users:
+          - name: gke_user
+            user:
+              token: ${ACCESS_TOKEN}
+          EOF
+
+      - name: Set KUBECONFIG env var
+        run: echo "KUBECONFIG=$GITHUB_WORKSPACE/ci-kubeconfig.yaml" >> $GITHUB_ENV
 
       - name: Print current kubeconfig context (debug)
         run: |
