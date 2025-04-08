@@ -117,4 +117,7 @@ jobs:
 
       - name: Terraform Apply
         working-directory: terraform
+        env:
+          TF_VAR_kubeconfig_path: ${{ env.KUBECONFIG }}
         run: terraform apply -auto-approve
+
