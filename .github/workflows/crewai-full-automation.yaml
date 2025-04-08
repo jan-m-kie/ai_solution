@@ -31,7 +31,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip install poetry
-          poetry install
+          poetry install -v
 
       - name: List Poetry packages
         run: poetry show
@@ -40,8 +40,8 @@ jobs:
       - name: Check if CrewAI CLI is available
         run: poetry run which crewai
 
-      - name: Run CrewAI
-        run: poetry run crewai
+      - name: Run CrewAI using module
+        run: poetry run python -m crewai run crewai.yaml
 
       - name: Commit generated .tf files
         run: |
