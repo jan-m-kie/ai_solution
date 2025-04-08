@@ -54,9 +54,8 @@ jobs:
 
       - name: Patch crewai.yaml with Git diff
         run: |
-          DIFF=$(cat diff.txt | sed -e 's/\\/\\\\/g' -e 's/"/\\"/g' -e ':a;N;$!ba;s/\n/\\n/g')
-          echo "$DIFF" > debug_diff.txt  # Optional: check escaped diff content
-          sed -i "s/{{DIFF}}/$DIFF/" crewai.yaml
+          DIFF=$(cat diff.txt | sed 's/\\/\\\\/g; s/"/\\"/g' | awk '{printf "%s\\n", $0}')
+          awk -v diff="$DIFF" '{gsub("{{DIFF}}", diff)}1' crewai.yaml > temp.yaml && mv temp.yaml crewai.yaml
 
       - name: Run CrewAI using CLI
         run: crewai run crewai.yaml
