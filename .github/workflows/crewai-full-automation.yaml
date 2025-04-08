@@ -68,18 +68,12 @@ jobs:
           git commit -m "Auto: Commit infra files from CrewAI" || echo "Nothing to commit"
           git push || echo "No changes to push"
 
-      - name: Set up kubeconfig from secret
-        run: |
-          echo "${{ secrets.KUBE_CONFIG_DATA }}" | base64 -d > $GITHUB_WORKSPACE/ci-kubeconfig.yaml
-
-      - name: Set KUBECONFIG env var
-        run: echo "KUBECONFIG=$GITHUB_WORKSPACE/ci-kubeconfig.yaml" >> $GITHUB_ENV
-
-      - name: Authenticate to GCP
+      - name: Authenticate to GCP and configure kubeconfig
         run: |
           echo "${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}" | base64 -d > "${HOME}/gcp-key.json"
           gcloud auth activate-service-account --key-file="${HOME}/gcp-key.json"
           gcloud config set project ai-solution-456211
+          gcloud container clusters get-credentials my-cluster --region europe-central2
 
       - name: Print current kubeconfig context (debug)
         run: |
