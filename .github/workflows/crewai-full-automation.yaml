@@ -31,13 +31,14 @@ jobs:
       - name: Install dependencies
         run: |
           pip install poetry
-          poetry install -v
+          poetry install
+          pip install crewai
 
       - name: List Poetry packages
         run: poetry show
 
       - name: Run CrewAI using CLI
-        run: poetry run crewai run crewai.yaml
+        run: crewai run crewai.yaml
 
       - name: Commit generated .tf files
         run: |
