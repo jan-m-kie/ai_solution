@@ -23,15 +23,22 @@ jobs:
 
       - name: Install Poetry
         run: |
-            curl -sSL https://install.python-poetry.org | python3 -
-            echo "$HOME/.local/bin" >> $GITHUB_PATH
-            export PATH="$HOME/.local/bin:$PATH"
-            poetry --version
+          curl -sSL https://install.python-poetry.org | python3 -
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+          export PATH="$HOME/.local/bin:$PATH"
+          poetry --version
 
       - name: Install dependencies
         run: |
           pip install poetry
           poetry install
+
+      - name: List Poetry packages
+        run: poetry show
+
+      ### ✅ DEBUG: Check if CrewAI CLI is installed
+      - name: Check if CrewAI CLI is available
+        run: poetry run which crewai
 
       - name: Run CrewAI
         run: poetry run crewai
