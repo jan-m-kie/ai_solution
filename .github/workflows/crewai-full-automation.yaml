@@ -18,7 +18,6 @@ jobs:
         with:
           fetch-depth: 2  # fetch 2 commits so HEAD^ is available
 
-
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
@@ -35,7 +34,7 @@ jobs:
         run: |
           pip install poetry
           poetry install
-          pip install crewai
+          pip install crewai  # Ensure CLI is available
 
       - name: List Poetry packages
         run: poetry show
@@ -55,12 +54,12 @@ jobs:
 
       - name: Patch crewai.yaml with Git diff
         run: |
-          DIFF=$(cat diff.txt | sed 's/"/\\"/g' | sed ':a;N;$!ba;s/\n/\\n/g')
-          echo "$DIFF" > debug_diff.txt  # Optional: for debugging
+          DIFF=$(cat diff.txt | sed -e 's/\\/\\\\/g' -e 's/"/\\"/g' -e ':a;N;$!ba;s/\n/\\n/g')
+          echo "$DIFF" > debug_diff.txt  # Optional: check escaped diff content
           sed -i "s/{{DIFF}}/$DIFF/" crewai.yaml
 
       - name: Run CrewAI using CLI
-        run: crewai run crewai.yaml --input diff.txt
+        run: crewai run crewai.yaml
 
       - name: Commit generated .tf files
         run: |
