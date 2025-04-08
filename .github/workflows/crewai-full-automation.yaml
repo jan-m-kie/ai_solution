@@ -73,6 +73,7 @@ jobs:
 
       - name: Restore kubeconfig
         run: |
+          mkdir -p ~/.kube
           echo "${{ secrets.KUBE_CONFIG_DATA }}" | base64 -d > ~/.kube/config
           chmod 600 ~/.kube/config
 
