@@ -37,8 +37,17 @@ jobs:
       - name: List Poetry packages
         run: poetry show
 
+      - name: Get recent file changes
+        id: changes
+        run: |
+          echo "files=$(git diff --name-only HEAD^ HEAD | tr '\n' ' ')" >> $GITHUB_OUTPUT
+
+      - name: Save changes to file for CrewAI
+        run: |
+          git diff HEAD^ HEAD > diff.txt
+
       - name: Run CrewAI using CLI
-        run: crewai run crewai.yaml
+        run: crewai run crewai.yaml --input diff.txt
 
       - name: Commit generated .tf files
         run: |
