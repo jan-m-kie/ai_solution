@@ -68,6 +68,11 @@ jobs:
           git commit -m "Auto: Commit infra files from CrewAI" || echo "Nothing to commit"
           git push || echo "No changes to push"
 
+      - name: Set up kubeconfig
+        run: |
+          mkdir -p ~/.kube
+          echo "${{ secrets.KUBECONFIG_BASE64 }}" | base64 -d > ~/.kube/config
+
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v2
 
