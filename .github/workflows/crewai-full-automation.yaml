@@ -53,6 +53,11 @@ jobs:
             echo "Initial commit or no previous commit found" > diff.txt
           fi
 
+      - name: Patch crewai.yaml with Git diff
+        run: |
+          DIFF=$(cat diff.txt | sed 's/"/\\"/g' | sed ':a;N;$!ba;s/\n/\\n/g')
+          echo "$DIFF" > debug_diff.txt  # Optional: for debugging
+          sed -i "s/{{DIFF}}/$DIFF/" crewai.yaml
 
       - name: Run CrewAI using CLI
         run: crewai run crewai.yaml --input diff.txt
