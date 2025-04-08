@@ -77,6 +77,13 @@ jobs:
           echo "${{ secrets.KUBE_CONFIG_DATA }}" | base64 -d > ~/.kube/config
           chmod 600 ~/.kube/config
 
+      - name: Authenticate to GCP
+        run: |
+          echo "${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}" | base64 -d > "${HOME}/gcp-key.json"
+          gcloud auth activate-service-account --key-file="${HOME}/gcp-key.json"
+          gcloud config set project ai-solution-456211
+          gcloud container clusters get-credentials my-cluster --region europe-central2
+
       - name: Terraform Init
         working-directory: terraform
         run: terraform init
