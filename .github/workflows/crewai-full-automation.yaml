@@ -36,8 +36,8 @@ jobs:
       - name: List Poetry packages
         run: poetry show
 
-      - name: Run CrewAI using module
-        run: poetry run python -m crewai run crewai.yaml
+      - name: Run CrewAI using CLI
+        run: poetry run crewai run crewai.yaml
 
       - name: Commit generated .tf files
         run: |
