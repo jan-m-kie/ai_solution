@@ -8,7 +8,12 @@ terraform {
 }
 
 provider "kubernetes" {
-  config_path = "~/.kube/config"
+  config_path = var.kubeconfig_path
+}
+
+variable "kubeconfig_path" {
+  type        = string
+  description = "Path to the kubeconfig file"
 }
 
 resource "kubernetes_namespace" "ai_solution" {
