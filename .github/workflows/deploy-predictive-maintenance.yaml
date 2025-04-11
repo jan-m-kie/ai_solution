@@ -2,10 +2,6 @@
 
 name: Deploy Predictive Maintenance App
 
-description: |
-  This is an application-specific deployment workflow. It listens for changes to app code
-  or Terraform files and takes care of infrastructure application and Kubernetes deployment.
-
 on:
   push:
     paths:
