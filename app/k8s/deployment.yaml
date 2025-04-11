@@ -1,0 +1,22 @@
+# app/k8s/deployment.yaml
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: predictive-maintenance-app
+  namespace: ai-solution
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: predictive-maintenance
+  template:
+    metadata:
+      labels:
+        app: predictive-maintenance
+    spec:
+      containers:
+      - name: predictive-maintenance
+        image: predictive-maintenance-app
+        ports:
+        - containerPort: 8080
