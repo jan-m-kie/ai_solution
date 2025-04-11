@@ -106,13 +106,12 @@ jobs:
       - name: Set KUBECONFIG env var
         run: echo "KUBECONFIG=$GITHUB_WORKSPACE/ci-kubeconfig.yaml" >> $GITHUB_ENV
 
-      - name: Print current kubeconfig context (debug)
-        run: |
-          kubectl config get-contexts
-          kubectl get ns || echo "kubectl not working"
-
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v2
+
+      - name: Terraform Init
+        working-directory: terraform
+        run: terraform init -input=false
 
       - name: Terraform Force Unlock if Locked
         working-directory: terraform
@@ -120,16 +119,29 @@ jobs:
           LOCK_FILE="gs://terraform-ai-solution-state/terraform/state/default.tflock"
           if gsutil -q stat "$LOCK_FILE"; then
             echo "Lock file found. Attempting to force unlock..."
-            LOCK_ID=$(gsutil cat "$LOCK_FILE" | grep -o '"ID":"[^"]*"' | cut -d':' -f2 | tr -d '"')
+            LOCK_ID=$(gsutil cat "$LOCK_FILE" | grep -o '"ID":"[^\"]*"' | cut -d':' -f2 | tr -d '"')
             echo "Lock ID: $LOCK_ID"
             terraform force-unlock -force "$LOCK_ID" || echo "Force unlock failed or not required"
           else
             echo "No lock file present. Proceeding."
           fi
 
-      - name: Terraform Init
+      - name: Terraform Conditional Import existing namespace
         working-directory: terraform
-        run: terraform init -input=false
+        env:
+          TF_VAR_kubeconfig_path: ${{ env.KUBECONFIG }}
+        run: |
+          if ! terraform state show kubernetes_namespace.ai_solution > /dev/null 2>&1; then
+            terraform import kubernetes_namespace.ai_solution ai-solution
+          else
+            echo "Namespace already in state. Skipping import."
+          fi
+
+      - name: Terraform Apply
+        working-directory: terraform
+        env:
+          TF_VAR_kubeconfig_path: ${{ env.KUBECONFIG }}
+        run: terraform apply -auto-approve
 
       - name: Cleanup stale Terraform lock (post-failure)
         if: failure()
@@ -138,12 +150,7 @@ jobs:
           echo "Checking for lock file in GCS..."
           gsutil rm gs://terraform-ai-solution-state/terraform/state/default.tflock || echo "No lock to remove"
 
-      - name: Terraform Import existing namespace (one-time step)
-        working-directory: terraform
-        run: terraform import kubernetes_namespace.ai_solution ai-solution || echo "Namespace already imported"
-
-      - name: Terraform Apply
-        working-directory: terraform
-        env:
-          TF_VAR_kubeconfig_path: ${{ env.KUBECONFIG }}
-        run: terraform apply -auto-approve
+      - name: Print current kubeconfig context (debug)
+        run: |
+          kubectl config get-contexts
+          kubectl get ns || echo "kubectl not working"
