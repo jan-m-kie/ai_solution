@@ -69,6 +69,29 @@ The agents will run their tasks directly in the cloud.
 
 ---
 
+## 🧩 Workflow Structure
+This project separates workflows into two categories:
+
+**1. full-automation.yaml (Generic)**
+Location: .github/workflows/full-automation.yaml
+
+Runs when: Changes occur in crewai.yaml, src/**, or terraform/**
+
+Purpose: Runs CrewAI to generate/update Terraform infrastructure as code.
+
+Use case: Shared automation across all apps; no app-specific logic here.
+
+**2. deploy-<app>.yaml (Per App)**
+Location: .github/workflows/deploy-predictive-maintenance.yaml (example)
+
+Runs when: Changes occur in app/**, terraform/**, or the workflow file itself
+
+Purpose: Deploys a specific app (e.g., Predictive Maintenance) to Kubernetes using Terraform + Docker.
+
+Use case: Isolated deployments with app-specific steps.
+
+
+
 ## 🛡 Disclaimer
 
 This project is for experimentation and prototyping. Outputs from AI agents should be reviewed before use in production environments.
