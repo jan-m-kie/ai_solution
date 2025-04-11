@@ -114,11 +114,18 @@ jobs:
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v2
 
-      - name: Terraform Force Unlock (prevent stale lock)
+      - name: Terraform Force Unlock if Locked
         working-directory: terraform
         run: |
-          echo "Checking and unlocking potential stale Terraform locks..."
-          terraform force-unlock -force 12345678 || echo "No stale lock found or invalid lock ID"
+          LOCK_FILE="gs://terraform-ai-solution-state/terraform/state/default.tflock"
+          if gsutil -q stat "$LOCK_FILE"; then
+            echo "Lock file found. Attempting to force unlock..."
+            LOCK_ID=$(gsutil cat "$LOCK_FILE" | grep -o '"ID":"[^"]*"' | cut -d':' -f2 | tr -d '"')
+            echo "Lock ID: $LOCK_ID"
+            terraform force-unlock -force "$LOCK_ID" || echo "Force unlock failed or not required"
+          else
+            echo "No lock file present. Proceeding."
+          fi
 
       - name: Terraform Init
         working-directory: terraform
