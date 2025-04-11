@@ -118,6 +118,10 @@ jobs:
         working-directory: terraform
         run: terraform init -input=false
 
+      - name: Terraform Import existing namespace (one-time step)
+        working-directory: terraform
+        run: terraform import kubernetes_namespace.ai_solution ai-solution || echo "Namespace already imported"
+
       - name: Terraform Apply
         working-directory: terraform
         env:
