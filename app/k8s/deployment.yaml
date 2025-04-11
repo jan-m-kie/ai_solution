@@ -17,6 +17,6 @@ spec:
     spec:
       containers:
       - name: predictive-maintenance
-        image: predictive-maintenance-app
+            image: gcr.io/ai-solution-456211/predictive-maintenance-app
         ports:
         - containerPort: 8080
