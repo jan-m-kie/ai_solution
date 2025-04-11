@@ -1,0 +1,15 @@
+# app/k8s/service.yaml
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: predictive-maintenance-service
+  namespace: ai-solution
+spec:
+  selector:
+    app: predictive-maintenance
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 8080
+  type: LoadBalancer
