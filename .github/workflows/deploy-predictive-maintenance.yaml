@@ -1,4 +1,4 @@
-# This is a dedicated workflow for the Predictive Maintenance app that runs Terraform and deploys the app.
+# This is a dedicated workflow for the Predictive Maintenance app that runs Terraform and deploys the app in GitHub.
 
 name: Deploy Predictive Maintenance App
 
