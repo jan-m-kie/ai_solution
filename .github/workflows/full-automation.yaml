@@ -2,10 +2,6 @@
 
 name: CrewAI Full Automation
 
-description: |
-  This is the generic CrewAI workflow. It runs on changes to infrastructure code or manually
-  and is responsible for generating Terraform configurations based on the app source and diff.
-
 on:
   workflow_dispatch:
   push:
