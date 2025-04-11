@@ -73,7 +73,7 @@ jobs:
           echo "${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}" | base64 -d > "${HOME}/gcp-key.json"
           gcloud auth activate-service-account --key-file="${HOME}/gcp-key.json"
           gcloud config set project ai-solution-456211
-          
+
           CLUSTER_NAME="my-cluster"
           CLUSTER_REGION="europe-central2"
           ENDPOINT=$(gcloud container clusters describe $CLUSTER_NAME --region $CLUSTER_REGION --format="value(endpoint)")
@@ -114,9 +114,22 @@ jobs:
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v2
 
+      - name: Terraform Force Unlock (prevent stale lock)
+        working-directory: terraform
+        run: |
+          echo "Checking and unlocking potential stale Terraform locks..."
+          terraform force-unlock -force 12345678 || echo "No stale lock found or invalid lock ID"
+
       - name: Terraform Init
         working-directory: terraform
         run: terraform init -input=false
+
+      - name: Cleanup stale Terraform lock (post-failure)
+        if: failure()
+        working-directory: terraform
+        run: |
+          echo "Checking for lock file in GCS..."
+          gsutil rm gs://terraform-ai-solution-state/terraform/state/default.tflock || echo "No lock to remove"
 
       - name: Terraform Import existing namespace (one-time step)
         working-directory: terraform
@@ -127,4 +140,3 @@ jobs:
         env:
           TF_VAR_kubeconfig_path: ${{ env.KUBECONFIG }}
         run: terraform apply -auto-approve
-
