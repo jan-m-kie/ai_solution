@@ -1,4 +1,9 @@
 terraform {
+  backend "gcs" {
+    bucket = "terraform-ai-solution-state"
+    prefix = "terraform/state"
+  }
+
   required_providers {
     kubernetes = {
       source  = "hashicorp/kubernetes"
