@@ -119,9 +119,7 @@ jobs:
           LOCK_FILE="gs://terraform-ai-solution-state/terraform/state/default.tflock"
           if gsutil -q stat "$LOCK_FILE"; then
             echo "Lock file found. Attempting to force unlock..."
-            LOCK_ID=$(gsutil cat "$LOCK_FILE" | grep -o '"ID":"[^\"]*"' | cut -d':' -f2 | tr -d '"')
-            echo "Lock ID: $LOCK_ID"
-            terraform force-unlock -force "$LOCK_ID" || echo "Force unlock failed or not required"
+            terraform force-unlock -force 00000000-0000-0000-0000-000000000000 || echo "Force unlock failed or not required"
           else
             echo "No lock file present. Proceeding."
           fi
@@ -131,11 +129,7 @@ jobs:
         env:
           TF_VAR_kubeconfig_path: ${{ env.KUBECONFIG }}
         run: |
-          if ! terraform state show kubernetes_namespace.ai_solution > /dev/null 2>&1; then
-            terraform import kubernetes_namespace.ai_solution ai-solution
-          else
-            echo "Namespace already in state. Skipping import."
-          fi
+          terraform state list | grep kubernetes_namespace.ai_solution || terraform import kubernetes_namespace.ai_solution ai-solution
 
       - name: Terraform Apply
         working-directory: terraform
