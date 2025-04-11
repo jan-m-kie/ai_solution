@@ -29,4 +29,8 @@ resource "kubernetes_namespace" "ai_solution" {
       team        = "ai"
     }
   }
+
+  lifecycle {
+    ignore_changes = all
+  }
 }
