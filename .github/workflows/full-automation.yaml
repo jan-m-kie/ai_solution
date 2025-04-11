@@ -1,0 +1,75 @@
+# This is the generic workflow that installs dependencies, runs CrewAI, and prepares Terraform.
+
+name: CrewAI Full Automation
+
+description: |
+  This is the generic CrewAI workflow. It runs on changes to infrastructure code or manually
+  and is responsible for generating Terraform configurations based on the app source and diff.
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - crewai.yaml
+      - src/**
+      - terraform/**
+
+jobs:
+  crewai:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 2
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install Poetry
+        run: |
+          curl -sSL https://install.python-poetry.org | python3 -
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+          export PATH="$HOME/.local/bin:$PATH"
+          poetry --version
+
+      - name: Install dependencies
+        run: |
+          pip install poetry
+          poetry install
+          pip install crewai
+
+      - name: List Poetry packages
+        run: poetry show
+
+      - name: Get recent file changes
+        id: changes
+        run: |
+          echo "files=$(git diff --name-only HEAD^ HEAD | tr '\n' ' ')" >> $GITHUB_OUTPUT
+
+      - name: Save changes to file for CrewAI
+        run: |
+          if git rev-parse HEAD^ >/dev/null 2>&1; then
+            git diff HEAD^ HEAD > diff.txt
+          else
+            echo "Initial commit or no previous commit found" > diff.txt
+          fi
+
+      - name: Patch crewai.yaml with Git diff
+        run: |
+          DIFF=$(cat diff.txt | sed 's/\\/\\\\/g; s/"/\\"/g' | awk '{printf "%s\\n", $0}')
+          awk -v diff="$DIFF" '{gsub("{{DIFF}}", diff)}1' crewai.yaml > temp.yaml && mv temp.yaml crewai.yaml
+
+      - name: Run CrewAI using CLI
+        run: crewai run
+
+      - name: Commit generated .tf files
+        run: |
+          git config --global user.email "ai-bot@crewai"
+          git config --global user.name "CrewAI Bot"
+          git add terraform/*.tf || echo "No .tf files to commit"
+          git commit -m "Auto: Commit infra files from CrewAI" || echo "Nothing to commit"
+          git push || echo "No changes to push"
